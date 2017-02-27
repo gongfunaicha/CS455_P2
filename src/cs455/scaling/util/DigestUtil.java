@@ -18,6 +18,8 @@ public class DigestUtil {
         byte[] hash = digest.digest(data);
         BigInteger hashInt = new BigInteger(1, hash);
 
-        return hashInt.toString(16);
+        // Making sure it returns 40 characters (full representation of SHA1), add leading 0 if not
+        return String.format("%040x", hashInt);
+
     }
 }
