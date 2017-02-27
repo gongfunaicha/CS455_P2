@@ -1,5 +1,7 @@
 package cs455.scaling.client;
 
+import cs455.scaling.clientThread.ClientSenderThread;
+import cs455.scaling.clientThread.ClientStatisticCollector;
 import cs455.scaling.util.HashStorage;
 import cs455.scaling.util.TimeStamp;
 
@@ -17,6 +19,8 @@ public class Client {
     private int messageRate = 1;
     private Selector selector= null;
     private HashStorage hashStorage = null;
+    private ClientSenderThread clientSenderThread = null;
+    private ClientStatisticCollector clientStatisticCollector = null;
 
     public Client(String[] args)
     {
@@ -102,7 +106,15 @@ public class Client {
         // Initialize hash storage
         hashStorage = new HashStorage();
 
-        // TODO: Finished connection, start sender thread and collector thread
+        // Initialize collector thread
+        clientStatisticCollector = new ClientStatisticCollector();
+
+        // Initialize sender thread
+        clientSenderThread = new ClientSenderThread(key, hashStorage, messageRate, clientStatisticCollector);
+
+        // Start both threads
+        clientSenderThread.start();
+        clientStatisticCollector.start();
     }
 
     private void read(SelectionKey key)

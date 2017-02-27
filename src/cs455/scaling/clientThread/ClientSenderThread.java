@@ -16,12 +16,14 @@ public class ClientSenderThread extends Thread{
     SelectionKey key = null;
     HashStorage hashStorage = null;
     int frequency = 1; // Number of messages per second
+    ClientStatisticCollector clientStatisticCollector = null;
 
-    public ClientSenderThread(SelectionKey key, HashStorage hashStorage, int frequency)
+    public ClientSenderThread(SelectionKey key, HashStorage hashStorage, int frequency, ClientStatisticCollector clientStatisticCollector)
     {
         this.key = key;
         this.hashStorage = hashStorage;
         this.frequency = frequency;
+        this.clientStatisticCollector = clientStatisticCollector;
     }
 
     @Override
@@ -51,6 +53,7 @@ public class ClientSenderThread extends Thread{
                     System.exit(1);
                 }
             }
+            clientStatisticCollector.incrementSendCount();
             byteBuffer.clear();
             try {
                 sleep(1000/frequency);
