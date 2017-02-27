@@ -153,7 +153,7 @@ public class Client {
         if (!hashStorage.checkAndRemove(hash))
         {
             // Does not contain hash
-            TimeStamp.printWithTimestamp("Recevied invalid hash.");
+            TimeStamp.printWithTimestamp("Received invalid hash.");
         }
 
     }
