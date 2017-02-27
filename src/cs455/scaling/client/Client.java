@@ -1,5 +1,6 @@
 package cs455.scaling.client;
 
+import cs455.scaling.util.HashStorage;
 import cs455.scaling.util.TimeStamp;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ public class Client {
     private int serverPort = 0;
     private int messageRate = 1;
     private Selector selector= null;
+    private HashStorage hashStorage = null;
 
     public Client(String[] args)
     {
@@ -39,7 +41,6 @@ public class Client {
         client.initializeSelector();
         client.connectToServer();
         client.startSelect();
-        // TODO: Connect to server, start statistics collector and sender thread
     }
 
     private void startSelect()
@@ -97,6 +98,9 @@ public class Client {
             TimeStamp.printWithTimestamp("Failed to connect to server. Program will now exit.");
             System.exit(1);
         }
+
+        // Initialize hash storage
+        hashStorage = new HashStorage();
 
         // TODO: Finished connection, start sender thread and collector thread
     }
