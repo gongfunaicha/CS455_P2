@@ -2,8 +2,6 @@ package cs455.scaling.clientThread;
 
 import cs455.scaling.util.TimeStamp;
 
-import java.sql.Time;
-
 public class ClientStatisticCollector extends Thread{
 
     private int sendCount = 0;

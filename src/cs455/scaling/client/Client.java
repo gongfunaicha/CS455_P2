@@ -7,6 +7,7 @@ import cs455.scaling.util.TimeStamp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -119,7 +120,42 @@ public class Client {
 
     private void read(SelectionKey key)
     {
-        // TODO: read from channel, remember to SYNCHRONIZE selection key
+        // Digest have 40 bytes (in hex)
+        ByteBuffer buffer = ByteBuffer.allocate(40);
+        buffer.clear();
+        int read = 0;
+        synchronized (key)
+        {
+            SocketChannel socketChannel  = (SocketChannel)key.channel();
+            try
+            {
+                while (buffer.hasRemaining() && read != -1)
+                    read = socketChannel.read(buffer);
+            }
+            catch (IOException e)
+            {
+                TimeStamp.printWithTimestamp("Failed to read data into buffer. Program will now exit.");
+                System.exit(1);
+            }
+        }
+        if (read == -1)
+        {
+            TimeStamp.printWithTimestamp("Lost connection to server. Program will now exit.");
+            System.exit(1);
+        }
+
+        // Increment receive counter
+        clientStatisticCollector.incrementReceiveCount();
+
+        // Remove hash from the hash storage
+        // TODO: Check whether need to rewind
+        String hash = new String(buffer.array());
+        if (!hashStorage.checkAndRemove(hash))
+        {
+            // Does not contain hash
+            TimeStamp.printWithTimestamp("Recevied invalid hash.");
+        }
+
     }
 
     private void initializeSelector()
