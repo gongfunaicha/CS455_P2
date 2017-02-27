@@ -1,6 +1,6 @@
 package cs455.scaling.client;
 
-import cs455.scaling.util.timeStamp;
+import cs455.scaling.util.TimeStamp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -28,8 +28,8 @@ public class Client {
         if (args.length != 3)
         {
             // Wrong number of arguments, display error message
-            timeStamp.printWithTimestamp("Invalid number of arguments");
-            timeStamp.printWithTimestamp("Usage: java cs455.scaling.client.Client server-host server-port message-rate");
+            System.out.println("Invalid number of arguments");
+            System.out.println("Usage: java cs455.scaling.client.Client server-host server-port message-rate");
             System.exit(1);
         }
 
@@ -50,7 +50,7 @@ public class Client {
             try {
                 selector.select();
             } catch (IOException e) {
-                timeStamp.printWithTimestamp("Failed to do select. Program will now exit.");
+                TimeStamp.printWithTimestamp("Failed to do select. Program will now exit.");
                 System.exit(1);
             }
 
@@ -82,19 +82,19 @@ public class Client {
         try {
              status = socketChannel.finishConnect();
         } catch (Exception e) {
-            timeStamp.printWithTimestamp("Failed to finish connect. Program will now exit.");
+            TimeStamp.printWithTimestamp("Failed to finish connect. Program will now exit.");
             System.exit(1);
         }
         if (status)
         {
             // Connect success, change intention
-            timeStamp.printWithTimestamp("Successfully connected to server.");
+            TimeStamp.printWithTimestamp("Successfully connected to server.");
             key.interestOps(SelectionKey.OP_READ);
         }
         else
         {
             // Connect failed
-            timeStamp.printWithTimestamp("Failed to connect to server. Program will now exit.");
+            TimeStamp.printWithTimestamp("Failed to connect to server. Program will now exit.");
             System.exit(1);
         }
 
@@ -111,7 +111,7 @@ public class Client {
         try {
             selector = Selector.open();
         } catch (IOException e) {
-            timeStamp.printWithTimestamp("Failed to open selector. Program will now exit.");
+            TimeStamp.printWithTimestamp("Failed to open selector. Program will now exit.");
             System.exit(1);
         }
     }
@@ -125,7 +125,7 @@ public class Client {
             socketChannel.register(selector, SelectionKey.OP_CONNECT);
             socketChannel.connect(new InetSocketAddress(serverHost, serverPort));
         } catch (IOException e) {
-            timeStamp.printWithTimestamp("Failed to connect to server. Program will now exit.");
+            TimeStamp.printWithTimestamp("Failed to connect to server. Program will now exit.");
             System.exit(1);
         }
 
@@ -136,7 +136,7 @@ public class Client {
         // Check hostname
         if (!validateIP(args[0]))
         {
-            timeStamp.printWithTimestamp("Error: Inputted IP not valid. Please check the server-host. Program will now exit.");
+            System.out.println("Error: Inputted IP not valid. Please check the server-host. Program will now exit.");
             System.exit(1);
         }
 
@@ -149,14 +149,14 @@ public class Client {
         }
         catch (NumberFormatException e)
         {
-            timeStamp.printWithTimestamp("Error: Inputted port number not int. Please check the server-port. Program will now exit.");
+            System.out.println("Error: Inputted port number not int. Please check the server-port. Program will now exit.");
             System.exit(1);
         }
 
         // Check port number between 0 and 65535
         if (serverPort < 0 || serverPort > 65535)
         {
-            timeStamp.printWithTimestamp("Error: Invalid port number. Port number should be between 0 and 65535. Program will now exit.");
+            System.out.println("Error: Invalid port number. Port number should be between 0 and 65535. Program will now exit.");
             System.exit(1);
         }
 
@@ -167,13 +167,13 @@ public class Client {
         }
         catch (NumberFormatException e)
         {
-            timeStamp.printWithTimestamp("Error: Inputted message rate not int. Please check the message-rate. Program will now exit.");
+            System.out.println("Error: Inputted message rate not int. Please check the message-rate. Program will now exit.");
             System.exit(1);
         }
 
         if (messageRate <= 0)
         {
-            timeStamp.printWithTimestamp("Error: Invalid message rate. Message rate should be greater than 0. Program will now exit.");
+            System.out.println("Error: Invalid message rate. Message rate should be greater than 0. Program will now exit.");
             System.exit(1);
         }
 
