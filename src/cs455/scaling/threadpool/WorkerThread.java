@@ -29,46 +29,49 @@ public class WorkerThread extends Thread{
 
     @Override
     public void run() {
-        // Avoid race condition of wait
-        synchronized (this)
+        while (true)
         {
-            // Add self back to workerQueue
-            workerQueue.addWorker(this);
-
-            while (task == null)
+            // Avoid race condition of wait
+            synchronized (this)
             {
-                try {
-                    this.wait();
-                } catch (InterruptedException e) {
-                    TimeStamp.printWithTimestamp("Interrupted when waiting for new task.");
+                // Add self back to workerQueue
+                workerQueue.addWorker(this);
+
+                while (task == null)
+                {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                        TimeStamp.printWithTimestamp("Interrupted when waiting for new task.");
+                    }
                 }
+
+                // Get key
+                SelectionKey key = task.getKey();
+
+                // Do the task based on task type
+                // 'R': Read, 'H': Hash, 'W': Write, 'A': Attempt write
+                switch (task.getTask())
+                {
+                    case 'R':
+                        this.read(key);
+                        break;
+                    case 'H':
+                        this.hash(key);
+                        break;
+                    case 'W':
+                        this.write(key);
+                        break;
+                    case 'A':
+                        this.rewrite(key);
+                        break;
+                    default:
+                        TimeStamp.printWithTimestamp("Received invalid task.");
+                }
+
+                // Finished task, set task back to null
+                task = null;
             }
-
-            // Get key
-            SelectionKey key = task.getKey();
-
-            // Do the task based on task type
-            // 'R': Read, 'H': Hash, 'W': Write, 'A': Attempt write
-            switch (task.getTask())
-            {
-                case 'R':
-                    this.read(key);
-                    break;
-                case 'H':
-                    this.hash(key);
-                    break;
-                case 'W':
-                    this.write(key);
-                    break;
-                case 'A':
-                    this.rewrite(key);
-                    break;
-                default:
-                    TimeStamp.printWithTimestamp("Received invalid task.");
-            }
-
-            // Finished task, set task back to null
-            task = null;
         }
     }
 

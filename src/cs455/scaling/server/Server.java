@@ -9,6 +9,7 @@ import cs455.scaling.util.queue.TaskQueue;
 import cs455.scaling.util.queue.WorkerQueue;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -135,6 +136,7 @@ public class Server {
             serverSocketChannel.socket().bind(new InetSocketAddress(port));
             serverSocketChannel.configureBlocking(false);
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+            TimeStamp.printWithTimestamp("Server started, listening on " + InetAddress.getLocalHost().getHostAddress() + ":" + String.valueOf(port));
         } catch (IOException e) {
             TimeStamp.printWithTimestamp("Failed to bind server to port.");
             System.exit(1);
@@ -196,6 +198,7 @@ public class Server {
         {
             System.out.println("Invalid number of arguments");
             System.out.println("Usage: java cs455.scaling.server.Server portnum thread-pool-size");
+            System.exit(1);
         }
     }
 }
