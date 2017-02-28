@@ -117,7 +117,7 @@ public class WorkerThread extends Thread{
         dataBuffer.flip();
         taskQueue.putTask(new Task('H', key));
 
-        TimeStamp.printWithTimestamp("Finished read task.");
+//        TimeStamp.printWithTimestamp("Finished read task.");
     }
 
     private void hash(SelectionKey key)
@@ -139,7 +139,7 @@ public class WorkerThread extends Thread{
         digestBuffer.flip();
         taskQueue.putTask(new Task('W', key));
 
-        TimeStamp.printWithTimestamp("Finished hash task.");
+//        TimeStamp.printWithTimestamp("Finished hash task.");
     }
 
     private void write(SelectionKey key)
@@ -172,7 +172,7 @@ public class WorkerThread extends Thread{
             digestBuffer.clear();
             serverStatisticsCollector.incrementThroughputCount();
             ((Attachment)key.attachment()).setNotInUse();
-            TimeStamp.printWithTimestamp("Finished write task.");
+//            TimeStamp.printWithTimestamp("Finished write task.");
         }
     }
 
@@ -208,7 +208,7 @@ public class WorkerThread extends Thread{
             ((Attachment)key.attachment()).setNotInUse();
             ((Attachment)key.attachment()).setNotAlreadyRewrite();
             key.interestOps(SelectionKey.OP_READ);
-            TimeStamp.printWithTimestamp("Finished rewrite task.");
+//            TimeStamp.printWithTimestamp("Finished rewrite task.");
         }
     }
 
