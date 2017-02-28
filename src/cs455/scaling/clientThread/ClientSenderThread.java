@@ -45,12 +45,33 @@ public class ClientSenderThread extends Thread{
                 SocketChannel socketChannel = (SocketChannel) key.channel();
                 byteBuffer.put(data);
                 byteBuffer.rewind();
-                try {
-                    // Currently ignore send buffer full on client side
-                    socketChannel.write(byteBuffer);
-                } catch (IOException e) {
-                    TimeStamp.printWithTimestamp("Failed to write data to socket channel. Program will now exit.");
-                    System.exit(1);
+
+                // Used to signal whether it is the first attempt
+                boolean firstAttempt = true;
+
+                // If send buffer full, retry every 1 millisecond to ensure not sending partial data
+                while (byteBuffer.hasRemaining())
+                {
+                    if (firstAttempt)
+                    {
+                        firstAttempt = false;
+                    }
+                    else
+                    {
+                        try {
+                            sleep(1);
+                        } catch (InterruptedException e) {
+                            TimeStamp.printWithTimestamp("Interrupted when trying to wait for one millisecond");
+                        }
+                    }
+
+                    // Write to socket channel
+                    try {
+                        socketChannel.write(byteBuffer);
+                    } catch (IOException e) {
+                        TimeStamp.printWithTimestamp("Failed to write data to socket channel. Program will now exit.");
+                        System.exit(1);
+                    }
                 }
             }
             clientStatisticCollector.incrementSendCount();
