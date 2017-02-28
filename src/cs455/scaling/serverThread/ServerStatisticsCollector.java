@@ -20,6 +20,13 @@ public class ServerStatisticsCollector extends Thread{
     public void run() {
         while (true)
         {
+            // Wait for 5 seconds
+            try {
+                sleep(5000);
+            } catch (InterruptedException e) {
+                TimeStamp.printWithTimestamp("Interrupted while waiting to print next throughput message.");
+            }
+
             // Use cache to store values
             int cacheConnection = 0;
             double cacheThroughput = 0;
@@ -38,13 +45,6 @@ public class ServerStatisticsCollector extends Thread{
 
             // Print out active connection and throughput
             TimeStamp.printWithTimestamp("Current Server Throughput: " + String.valueOf(cacheThroughput/5) + " messages/s, Active Client Connections: " + String.valueOf(cacheConnection));
-
-            // Wait for 5 seconds
-            try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-                TimeStamp.printWithTimestamp("Interrupted while waiting to print next throughput message.");
-            }
         }
     }
 
