@@ -47,7 +47,7 @@ public class WorkerThread extends Thread{
             SelectionKey key = task.getKey();
 
             // Do the task based on task type
-            // 'R': Read, 'H': Hash, 'W': Write
+            // 'R': Read, 'H': Hash, 'W': Write, 'A': Attempt write
             switch (task.getTask())
             {
                 case 'R':
@@ -58,6 +58,9 @@ public class WorkerThread extends Thread{
                     break;
                 case 'W':
                     this.write(key);
+                    break;
+                case 'A':
+                    this.rewrite(key);
                     break;
                 default:
                     TimeStamp.printWithTimestamp("Received invalid task.");
@@ -118,7 +121,12 @@ public class WorkerThread extends Thread{
 
     private void write(SelectionKey key)
     {
-        // TODO: Perform write task, remember to change intent back to OP_READ, and change in use back to false
+        // TODO: Perform write task, change in use back to false
+    }
+
+    private void rewrite(SelectionKey key)
+    {
+        // TODO: Perform rewrite task, remember to change intent back to OP_READ, and change in use back to false
     }
 
     public synchronized void setTask(Task task)

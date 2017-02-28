@@ -108,7 +108,8 @@ public class Server {
 
     private void write(SelectionKey key)
     {
-        taskQueue.putTask(new Task('W', key));
+        // Attempt write event
+        taskQueue.putTask(new Task('A', key));
     }
 
     private void startSelector()

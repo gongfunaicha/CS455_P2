@@ -6,7 +6,7 @@ public class Task {
     private char task = 0;
     private SelectionKey key = null;
 
-    // 'R': Read, 'H': Hash, 'W': Write
+    // 'R': Read, 'H': Hash, 'W': Write, 'A': Attempt write
     public Task(char task, SelectionKey key)
     {
         this.task = task;
