@@ -108,7 +108,13 @@ public class Server {
 
     private void write(SelectionKey key)
     {
-        // Attempt write event
+        Attachment attachment = (Attachment)key.attachment();
+        if (attachment.getAndUpdateAlreadyRewrite())
+        {
+            // Currently already rewrite, skip
+            return;
+        }
+        // Attempt rewrite event
         taskQueue.putTask(new Task('A', key));
     }
 

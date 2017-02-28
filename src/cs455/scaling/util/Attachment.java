@@ -10,6 +10,8 @@ public class Attachment {
     private ByteBuffer digestBuffer = null;
     // Used to signal that the current channel is (planned to be) in use
     private boolean inUse = false;
+    // Used to signal that the current channel is planned to have rewrite
+    private boolean alreadyRewrite = false;
 
     public Attachment()
     {
@@ -34,9 +36,30 @@ public class Attachment {
         }
     }
 
+    // Return true if currently already rewrite, false if not and set already rewrite to true
+    public synchronized boolean getAndUpdateAlreadyRewrite()
+    {
+        if (alreadyRewrite)
+        {
+            // Currently in use, return true
+            return true;
+        }
+        else
+        {
+            // Currently not in use, set in use to true and return false
+            alreadyRewrite = true;
+            return false;
+        }
+    }
+
     public synchronized void setNotInUse()
     {
         inUse = false;
+    }
+
+    public synchronized void setNotAlreadyRewrite()
+    {
+        alreadyRewrite = false;
     }
 
     public ByteBuffer getDataBuffer()

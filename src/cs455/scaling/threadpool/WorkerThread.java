@@ -169,12 +169,44 @@ public class WorkerThread extends Thread{
             digestBuffer.clear();
             serverStatisticsCollector.incrementThroughputCount();
             ((Attachment)key.attachment()).setNotInUse();
+            TimeStamp.printWithTimestamp("Finished write task.");
         }
     }
 
     private void rewrite(SelectionKey key)
     {
-        // TODO: Perform rewrite task, remember to change intent back to OP_READ, and change in use back to false
+        SocketChannel socketChannel = (SocketChannel)key.channel();
+        ByteBuffer digestBuffer = ((Attachment)key.attachment()).getDigestBuffer();
+
+        try {
+            socketChannel.write(digestBuffer);
+        } catch (IOException e) {
+            TimeStamp.printWithTimestamp("Failed to write to channel. Terminating connection.");
+            try {
+                socketChannel.close();
+            } catch (IOException e1) {
+                TimeStamp.printWithTimestamp("Failed to close connection.");
+            }
+            serverStatisticsCollector.decrementActiveConnectionCount();
+            return;
+        }
+
+        if (digestBuffer.hasRemaining())
+        {
+            // Not fully written, compact and reset already rewrite
+            digestBuffer.compact();
+            ((Attachment)key.attachment()).setNotAlreadyRewrite();
+        }
+        else
+        {
+            // Fully written, task completed, set not in use, set not already rewrite, set back to OP_READ
+            digestBuffer.clear();
+            serverStatisticsCollector.incrementThroughputCount();
+            ((Attachment)key.attachment()).setNotInUse();
+            ((Attachment)key.attachment()).setNotAlreadyRewrite();
+            key.interestOps(SelectionKey.OP_READ);
+            TimeStamp.printWithTimestamp("Finished rewrite task.");
+        }
     }
 
     public synchronized void setTask(Task task)
