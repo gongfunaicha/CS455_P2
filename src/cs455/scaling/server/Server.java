@@ -154,8 +154,6 @@ public class Server {
         // Start threadpool manager
         threadpoolManager = new ThreadpoolManager(threadPoolSize, taskQueue, workerQueue, serverStatisticsCollector);
         threadpoolManager.start();
-
-        // TODO: Start threads?
     }
 
     private void checkArguments(String[] args)
