@@ -30,11 +30,41 @@ public class WorkerThread extends Thread{
                     TimeStamp.printWithTimestamp("Interrupted when waiting for new task.");
                 }
             }
-            // TODO: Wake up, do the task based on task type
+            // Do the task based on task type
+            // 'R': Read, 'H': Hash, 'W': Write
+            switch (task.getTask())
+            {
+                case 'R':
+                    this.read();
+                    break;
+                case 'H':
+                    this.hash();
+                    break;
+                case 'W':
+                    this.write();
+                    break;
+                default:
+                    TimeStamp.printWithTimestamp("Received invalid task.");
+            }
 
             // Finished task, set task back to null
             task = null;
         }
+    }
+
+    private void read()
+    {
+        // TODO: Perform read task
+    }
+
+    private void hash()
+    {
+        // TODO: Perform hash task
+    }
+
+    private void write()
+    {
+        // TODO: Perform write task
     }
 
     public synchronized void setTask(Task task)
