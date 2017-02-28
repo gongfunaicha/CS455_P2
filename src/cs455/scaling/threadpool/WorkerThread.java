@@ -3,6 +3,7 @@ package cs455.scaling.threadpool;
 import cs455.scaling.serverThread.ServerStatisticsCollector;
 import cs455.scaling.task.Task;
 import cs455.scaling.util.Attachment;
+import cs455.scaling.util.DigestUtil;
 import cs455.scaling.util.TimeStamp;
 import cs455.scaling.util.queue.TaskQueue;
 import cs455.scaling.util.queue.WorkerQueue;
@@ -112,16 +113,63 @@ public class WorkerThread extends Thread{
         // Flip data buffer and add hash task to task queue
         dataBuffer.flip();
         taskQueue.putTask(new Task('H', key));
+
+        TimeStamp.printWithTimestamp("Finished read task.");
     }
 
     private void hash(SelectionKey key)
     {
-        // TODO: Perform hash task
+        Attachment attachment = (Attachment)key.attachment();
+        ByteBuffer dataBuffer = attachment.getDataBuffer();
+        ByteBuffer digestBuffer = attachment.getDigestBuffer();
+
+        // Get data from data buffer and clear the buffer
+        byte[] data = new byte[dataBuffer.remaining()];
+        dataBuffer.get(data);
+        dataBuffer.clear();
+
+        // Do SHA1
+        String digest = DigestUtil.SHA1FromBytes(data);
+
+        // Put bytes into digest buffer
+        digestBuffer.put(digest.getBytes());
+        digestBuffer.flip();
+        taskQueue.putTask(new Task('W', key));
+
+        TimeStamp.printWithTimestamp("Finished hash task.");
     }
 
     private void write(SelectionKey key)
     {
-        // TODO: Perform write task, change in use back to false
+        SocketChannel socketChannel = (SocketChannel)key.channel();
+        ByteBuffer digestBuffer = ((Attachment)key.attachment()).getDigestBuffer();
+
+        try {
+            socketChannel.write(digestBuffer);
+        } catch (IOException e) {
+            TimeStamp.printWithTimestamp("Failed to write to channel. Terminating connection.");
+            try {
+                socketChannel.close();
+            } catch (IOException e1) {
+                TimeStamp.printWithTimestamp("Failed to close connection.");
+            }
+            serverStatisticsCollector.decrementActiveConnectionCount();
+            return;
+        }
+
+        if (digestBuffer.hasRemaining())
+        {
+            // Not fully written, compact and acquire OP_WRITE
+            digestBuffer.compact();
+            key.interestOps(SelectionKey.OP_WRITE);
+        }
+        else
+        {
+            // Fully written, task completed, set not in use
+            digestBuffer.clear();
+            serverStatisticsCollector.incrementThroughputCount();
+            ((Attachment)key.attachment()).setNotInUse();
+        }
     }
 
     private void rewrite(SelectionKey key)

@@ -148,8 +148,10 @@ public class Client {
         clientStatisticCollector.incrementReceiveCount();
 
         // Remove hash from the hash storage
-        // TODO: Check whether need to rewind
-        String hash = new String(buffer.array());
+        buffer.flip();
+        byte[] bytehash = new byte[buffer.remaining()];
+        buffer.get(bytehash);
+        String hash = new String(bytehash);
         if (!hashStorage.checkAndRemove(hash))
         {
             // Does not contain hash
