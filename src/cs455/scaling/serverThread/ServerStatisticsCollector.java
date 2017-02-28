@@ -43,7 +43,7 @@ public class ServerStatisticsCollector extends Thread{
             try {
                 sleep(5000);
             } catch (InterruptedException e) {
-                TimeStamp.printWithTimestamp("Interrupted when waiting to print next throughput message.");
+                TimeStamp.printWithTimestamp("Interrupted while waiting to print next throughput message.");
             }
         }
     }
