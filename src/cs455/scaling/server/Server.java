@@ -1,9 +1,19 @@
 package cs455.scaling.server;
 
+import cs455.scaling.util.TimeStamp;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+
 public class Server {
 
     private int port = 0;
     private int threadPoolSize = 0;
+    private ServerSocketChannel serverSocketChannel = null;
+    private Selector selector = null;
 
     public Server(String[] args)
     {
@@ -14,6 +24,35 @@ public class Server {
     public static void main(String[] args)
     {
         Server server =  new Server(args);
+        // TODO: start selector and server channel
+        server.startSelector();
+        server.bind();
+
+    }
+
+    private void startSelector()
+    {
+        try {
+            selector = Selector.open();
+        } catch (IOException e) {
+            TimeStamp.printWithTimestamp("Failed to open selector. Program will now exit.");
+            System.exit(1);
+        }
+    }
+
+    private void bind()
+    {
+        try {
+            serverSocketChannel = ServerSocketChannel.open();
+            serverSocketChannel.socket().bind(new InetSocketAddress(port));
+            serverSocketChannel.configureBlocking(false);
+            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        } catch (IOException e) {
+            TimeStamp.printWithTimestamp("Failed to bind server to port.");
+            System.exit(1);
+        }
+        // TODO: Start threads?
+
     }
 
     private void checkArguments(String[] args)
