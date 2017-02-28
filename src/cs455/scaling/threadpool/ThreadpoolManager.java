@@ -9,11 +9,11 @@ public class ThreadpoolManager extends Thread{
     private TaskQueue taskQueue = null;
     private WorkerQueue workerQueue = null;
 
-    public ThreadpoolManager(int numThread)
+    public ThreadpoolManager(int numThread, TaskQueue taskQueue, WorkerQueue workerQueue)
     {
         this.numThread = numThread;
-        this.taskQueue = new TaskQueue();
-        this.workerQueue = new WorkerQueue();
+        this.taskQueue = taskQueue;
+        this.workerQueue = workerQueue;
     }
 
     @Override

@@ -1,12 +1,19 @@
 package cs455.scaling.server;
 
+import cs455.scaling.serverThread.ServerStatisticsCollector;
+import cs455.scaling.task.Task;
+import cs455.scaling.threadpool.ThreadpoolManager;
+import cs455.scaling.util.Attachment;
 import cs455.scaling.util.TimeStamp;
+import cs455.scaling.util.queue.TaskQueue;
+import cs455.scaling.util.queue.WorkerQueue;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 public class Server {
@@ -15,6 +22,10 @@ public class Server {
     private int threadPoolSize = 0;
     private ServerSocketChannel serverSocketChannel = null;
     private Selector selector = null;
+    private ServerStatisticsCollector serverStatisticsCollector = null;
+    private TaskQueue taskQueue = null;
+    private WorkerQueue workerQueue = null;
+    private ThreadpoolManager threadpoolManager = null;
 
     public Server(String[] args)
     {
@@ -27,6 +38,7 @@ public class Server {
         Server server =  new Server(args);
         server.startSelector();
         server.bind();
+        server.startThreads();
         server.select();
     }
 
@@ -69,12 +81,29 @@ public class Server {
 
     private void accept(SelectionKey key)
     {
-        // TODO: Accept incoming connection
+        ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+        SocketChannel socketChannel = null;
+        try {
+            socketChannel = serverSocketChannel.accept();
+            socketChannel.configureBlocking(false);
+            socketChannel.register(selector, SelectionKey.OP_READ, new Attachment());
+        } catch (IOException e) {
+            TimeStamp.printWithTimestamp("Failed to accept one incoming connection.");
+            return;
+        }
+        serverStatisticsCollector.incrementActiveConnectionCount();
     }
 
     private void read(SelectionKey key)
     {
-        // TODO: Check in use, and add work that reads from channel
+        Attachment attachment = (Attachment)key.attachment();
+        if (attachment.getAndUpdateInUse())
+        {
+            // Currently in use, skip
+            return;
+        }
+        // Currently not in use, add to task queue
+        taskQueue.putTask(new Task('R', key));
     }
 
     private void write(SelectionKey key)
@@ -103,8 +132,23 @@ public class Server {
             TimeStamp.printWithTimestamp("Failed to bind server to port.");
             System.exit(1);
         }
-        // TODO: Start threads?
+    }
 
+    private void startThreads()
+    {
+        // Initialize task queue and worker queue
+        taskQueue = new TaskQueue();
+        workerQueue = new WorkerQueue();
+
+        // Start statistics collector
+        serverStatisticsCollector = new ServerStatisticsCollector();
+        serverStatisticsCollector.start();
+
+        // Start threadpool manager
+        threadpoolManager = new ThreadpoolManager(threadPoolSize, taskQueue, workerQueue);
+        threadpoolManager.start();
+
+        // TODO: Start threads?
     }
 
     private void checkArguments(String[] args)
