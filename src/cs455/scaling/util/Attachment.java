@@ -34,6 +34,11 @@ public class Attachment {
         }
     }
 
+    public synchronized void setNotInUse()
+    {
+        inUse = false;
+    }
+
     public ByteBuffer getDataBuffer()
     {
         return dataBuffer;

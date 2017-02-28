@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.util.Iterator;
 
 public class Server {
 
@@ -24,10 +25,61 @@ public class Server {
     public static void main(String[] args)
     {
         Server server =  new Server(args);
-        // TODO: start selector and server channel
         server.startSelector();
         server.bind();
+        server.select();
+    }
 
+    private void select()
+    {
+        // Do main select
+        while (true)
+        {
+            try {
+                selector.select();
+            } catch (IOException e) {
+                TimeStamp.printWithTimestamp("Failed to select. Program will now exit.");
+                System.exit(1);
+            }
+
+            Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
+
+            while (keys.hasNext())
+            {
+                SelectionKey key = keys.next();
+
+                if (key.isAcceptable())
+                {
+                    this.accept(key);
+                }
+                else if (key.isReadable())
+                {
+                    this.read(key);
+                }
+                else if (key.isWritable())
+                {
+                    this.write(key);
+                }
+
+                keys.remove();
+            }
+
+        }
+    }
+
+    private void accept(SelectionKey key)
+    {
+        // TODO: Accept incoming connection
+    }
+
+    private void read(SelectionKey key)
+    {
+        // TODO: Check in use, and add work that reads from channel
+    }
+
+    private void write(SelectionKey key)
+    {
+        // TODO: Add work that writes to channel, remember to change intent back to OP_READ
     }
 
     private void startSelector()
