@@ -34,7 +34,6 @@ public class ServerStatisticsCollector extends Thread{
             synchronized (activeConnectionLock)
             {
                 cacheConnection = activeConnection;
-                activeConnection = 0;
             }
 
             synchronized (throughputLock)
