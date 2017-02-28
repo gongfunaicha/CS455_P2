@@ -64,7 +64,7 @@ public class WorkerThread extends Thread{
 
     private void write()
     {
-        // TODO: Perform write task
+        // TODO: Perform write task, remember to change intent back to OP_READ, and change in use back to false
     }
 
     public synchronized void setTask(Task task)

@@ -108,7 +108,7 @@ public class Server {
 
     private void write(SelectionKey key)
     {
-        // TODO: Add work that writes to channel, remember to change intent back to OP_READ
+        taskQueue.putTask(new Task('W', key));
     }
 
     private void startSelector()
