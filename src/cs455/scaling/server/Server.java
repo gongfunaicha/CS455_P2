@@ -61,6 +61,12 @@ public class Server {
             {
                 SelectionKey key = keys.next();
 
+                // If key is no longer valid (possibly due to disconnect), ignore the current key
+                if (!key.isValid())
+                {
+                    keys.remove();
+                    continue;
+                }
                 if (key.isAcceptable())
                 {
                     this.accept(key);
