@@ -117,6 +117,8 @@ public class WorkerThread extends Thread{
         dataBuffer.flip();
         taskQueue.putTask(new Task('H', key));
 
+        serverStatisticsCollector.incrementThroughputCount();
+
 //        TimeStamp.printWithTimestamp("Finished read task.");
     }
 

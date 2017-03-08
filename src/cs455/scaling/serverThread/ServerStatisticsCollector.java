@@ -42,8 +42,8 @@ public class ServerStatisticsCollector extends Thread{
                 throughput = 0;
             }
 
-            // Print out active connection and throughput
-            TimeStamp.printWithTimestamp("Current Server Throughput: " + String.valueOf(cacheThroughput/5) + " messages/s, Active Client Connections: " + String.valueOf(cacheConnection));
+            // Print out active connection and throughput, divided by 10 due to calculating the average of read and write
+            TimeStamp.printWithTimestamp("Current Server Throughput: " + String.valueOf(cacheThroughput/10) + " messages/s, Active Client Connections: " + String.valueOf(cacheConnection));
         }
     }
 
