@@ -2,13 +2,13 @@ CS455 Homework 2 - Programming Component
 SCALABLE SERVER DESIGN: USING THREAD POOLS TO MANAGE ACTIVE NETWORK CONNECTIONS
 
 Compilation:
-Please use "make" command to compile the whole project.
+Please use "make all" command to compile the whole project.
 If you want to remove the .class files produced by the compilation, please use command "make clean".
 
 Executing project:
-Registry:
+Server:
 	java cs455.scaling.server.Server <portnum> <thread-pool-size>
-Messaging Node:
+Client:
 	java cs455.scaling.client.Client <server-host> <server-port> <message-rate>
 
 Files:
@@ -20,7 +20,7 @@ cs455/
 			ClientSenderThread.java: Constantly generate and send data over channel at given speed.
 			ClientStatisticsCollector.java: Collects sending and receiving statistics and prints out statistics every 10 seconds.
 		server/
-			Server.java: Main class for server side. Performs command line check, binds to one local port, start statistics collector thread and threadpool manager thread, and uses NIO to deal with accept, read, and write.
+			Server.java: Main class for server side. Performs command line check, binds to one local port, starts statistics collector thread and threadpool manager thread, and uses NIO to deal with accept, read, and write.
 		serverThread/
 			ServerStatisticsCollector.java: Collects throughput and active connection statistics and prints out statistics every 5 seconds.
 		task/
